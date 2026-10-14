@@ -3,15 +3,22 @@ using UnityEngine;
 [RequireComponent(typeof(MapVizualiser))]
 public class MapController : MonoBehaviour
 {
+    //map settings
     public int seed = 152;
     public int width = 100;
     public int height = 100;
+
+    //wavefront algorithm settings
     [Range(0, 1)] public float mountainess = 1f;
 
+    //perlin noise settings
     public int octaves = 5;
     [Range(0, 1)] public float persistence = 0.5f;
-    public float roughness = 2f;
+    public float roughness = 3f;
     [Range(0, 0.2f)] public float scale = 0.05f;
+
+    //quantizing settings
+    public int quantizingPrecision = 10;
 
     private MapVizualiser mapVizualiser;
     private Map map;
@@ -24,7 +31,12 @@ public class MapController : MonoBehaviour
     [ContextMenu("Create Map")]
     public void CreateMap()
     {
-        map = MapGenerator.GenerateMap(seed, width, height, octaves, persistence, roughness, scale);
+        map = new Map(width, height);
+        System.Random random = new System.Random(seed);
+
+        float[,] noise = MapGenerator.PerlinNoiseHeightmap(width, height, octaves, persistence, roughness, scale, random);
+        int[,] quantizedNoise = Utils.QuantizeFloatArray(noise, quantizingPrecision);
+        map.heightmap = MapGenerator.WaterfrontHeightmap(width, height, mountainess, quantizedNoise, random);
 
         mapVizualiser.VisualizeMap(map);
     }

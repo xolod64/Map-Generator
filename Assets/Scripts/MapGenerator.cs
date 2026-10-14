@@ -3,45 +3,39 @@ using UnityEngine;
 
 public static class MapGenerator
 {
-    public static Map GenerateMap(int seed, int width, int height, int octaves, float persistence, float roughness, float scale)
-    {
-        Map newMap = new Map(width, height);
-        System.Random random = new System.Random(seed);
-
-        newMap.heightmap = PerlinNoiseHeightmap(width, height, octaves, persistence, roughness, scale, random);
-        return newMap;
-    }
-
-    public static float[,] WaterfrontHeightmap(int width, int height, float mountainess, System.Random random)
+    public static float[,] WaterfrontHeightmap(int width, int height, float mountainess, int[,] priority, System.Random random)
     {
         float[,] newHeightmap = new float[width, height];
 
         float step = 0.1763f;
 
         bool[,] visited = new bool[width, height];
-        List<Vector2Int> startPoints = Utils.TwoDimentionalArrayBounds(width, height);
+        // List<Vector2Int> startPoints = Utils.TwoDimentionalArrayBounds(width, height);
+        PriorityQueue<Vector2Int> startPoints = new PriorityQueue<Vector2Int>();
         List<Vector2Int> neighborBuffer = new List<Vector2Int>(4);
 
         int visitedCount = startPoints.Count;
         int totalCount = width * height;
 
-        foreach (Vector2Int coord in startPoints)
+        foreach (Vector2Int coord in Utils.TwoDimentionalArrayBounds(width, height))
         {
             int x = coord.x;
             int y = coord.y;
 
+            startPoints.Enqueue(coord, priority[x, y]);
             visited[x, y] = true;
         }
 
         while (startPoints.Count > 0)
         {
-            int i = random.Next(0, startPoints.Count);
+            // int i = random.Next(0, startPoints.Count);
             neighborBuffer.Clear();
 
             float visitedRatio = (float)visitedCount / totalCount;
-            float currentStep = step * mountainess * visitedRatio * visitedRatio;
+            float currentStep = step * mountainess;
 
-            Vector2Int currentPoint = startPoints[i];
+            // Vector2Int currentPoint = startPoints[i];
+            Vector2Int currentPoint = startPoints.Dequeue();
             int x = currentPoint.x;
             int y = currentPoint.y;
 
@@ -55,7 +49,8 @@ public static class MapGenerator
                 if (!visited[nX, nY]) neighborBuffer.Add(new Vector2Int(nX, nY));
             }
 
-            if (neighborBuffer.Count < 2) startPoints.SwapBackAndRemove(i);
+            // if (neighborBuffer.Count < 2) startPoints.SwapBackAndRemove(i);
+            if (neighborBuffer.Count > 1) startPoints.Enqueue(currentPoint, priority[x, y]);
             if (neighborBuffer.Count > 0)
             {
                 neighborBuffer.Shuffle(random);
@@ -64,7 +59,8 @@ public static class MapGenerator
                 int nX = neighbor.x;
                 int nY = neighbor.y;
 
-                startPoints.Add(neighbor);
+                // startPoints.Add(neighbor);
+                startPoints.Enqueue(neighbor, priority[nX, nY]);
                 visited[nX, nY] = true;
                 newHeightmap[nX, nY] = newHeightmap[x, y] + currentStep;
 

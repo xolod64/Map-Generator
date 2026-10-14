@@ -35,9 +35,17 @@ public static class Utils
         return coords;
     }
 
-    public static int[,] QuantizeFloatArray(float[,] array)
+    public static int[,] QuantizeFloatArray(float[,] array, int precision)
     {
         int[,] newArray = new int[array.GetLength(0), array.GetLength(1)];
+
+        for (int x = 0; x < array.GetLength(0); x++)
+        {
+            for (int y = 0; y < array.GetLength(1); y++)
+            {
+                newArray[x, y] = Mathf.RoundToInt(array[x, y] * precision);
+            }
+        }
 
         return newArray;
     }
@@ -52,7 +60,7 @@ public static class Utils
     public static void Shuffle<T>(this List<T> list, System.Random random)
     {
         int count = list.Count;
-        
+
         for (int i = count - 1; i > 0; i--)
         {
             int randomIndex = random.Next(0, i + 1);
