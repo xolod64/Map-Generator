@@ -55,4 +55,11 @@ public static class Utils
             list[randomIndex] = temp;
         }
     }
+
+    public static void SwapBackAndRemove<T>(this List<T> list, int index)
+    {
+        int lastIndex = list.Count - 1;
+        list[index] = list[lastIndex];
+        list.RemoveAt(lastIndex);
+    }
 }

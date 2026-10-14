@@ -3,16 +3,27 @@ using UnityEngine;
 
 public static class MapGenerator
 {
-    public static void GenerateHeightmap(float[,] heightmap, float mountainess, System.Random random)
+    public static Map GenerateMap(int seed, int width, int height, float mountainess)
     {
-        float step = 0.1763f;
+        Map newMap = new Map(width, height);
+        System.Random random = new System.Random(seed);
 
-        int width = heightmap.GetLength(0);
-        int height = heightmap.GetLength(1);
+        newMap.heightmap = GenerateHeightmap(width, height, mountainess, random);
+        return newMap;
+    }
+
+    public static float[,] GenerateHeightmap(int width, int height, float mountainess, System.Random random)
+    {
+        float[,] newHeightmap = new float[width, height];
+
+        float step = 0.1763f;
 
         bool[,] visited = new bool[width, height];
         List<Vector2Int> startPoints = Utils.TwoDimentionalArrayBounds(width, height);
         List<Vector2Int> neighborBuffer = new List<Vector2Int>(4);
+
+        int visitedCount = startPoints.Count;
+        int totalCount = width * height;
 
         foreach (Vector2Int coord in startPoints)
         {
@@ -26,6 +37,9 @@ public static class MapGenerator
         {
             int i = random.Next(0, startPoints.Count);
             neighborBuffer.Clear();
+
+            float visitedRatio = (float)visitedCount / totalCount;
+            float currentStep = step * mountainess * visitedRatio * visitedRatio;
 
             Vector2Int currentPoint = startPoints[i];
             int x = currentPoint.x;
@@ -41,7 +55,23 @@ public static class MapGenerator
                 if (!visited[nX, nY]) neighborBuffer.Add(new Vector2Int(nX, nY));
             }
 
-            
+            if (neighborBuffer.Count < 2) startPoints.SwapBackAndRemove(i);
+            if (neighborBuffer.Count > 0)
+            {
+                neighborBuffer.Shuffle(random);
+
+                Vector2Int neighbor = neighborBuffer[0];
+                int nX = neighbor.x;
+                int nY = neighbor.y;
+
+                startPoints.Add(neighbor);
+                visited[nX, nY] = true;
+                newHeightmap[nX, nY] = newHeightmap[x, y] + currentStep;
+
+                visitedCount++;
+            }
         }
+
+        return newHeightmap;
     }
 }
