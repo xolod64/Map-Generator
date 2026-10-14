@@ -3,16 +3,16 @@ using UnityEngine;
 
 public static class MapGenerator
 {
-    public static Map GenerateMap(int seed, int width, int height, float mountainess)
+    public static Map GenerateMap(int seed, int width, int height, int octaves, float persistence, float roughness, float scale)
     {
         Map newMap = new Map(width, height);
         System.Random random = new System.Random(seed);
 
-        newMap.heightmap = GenerateHeightmap(width, height, mountainess, random);
+        newMap.heightmap = PerlinNoiseHeightmap(width, height, octaves, persistence, roughness, scale, random);
         return newMap;
     }
 
-    public static float[,] GenerateHeightmap(int width, int height, float mountainess, System.Random random)
+    public static float[,] WaterfrontHeightmap(int width, int height, float mountainess, System.Random random)
     {
         float[,] newHeightmap = new float[width, height];
 
@@ -73,5 +73,44 @@ public static class MapGenerator
         }
 
         return newHeightmap;
+    }
+
+    public static float[,] PerlinNoiseHeightmap(int width, int height, int octaves, float persistence, float roughness, float scale, System.Random random)
+    {
+        float[,] newHeightmap = new float[width, height];
+
+        float offsetX = (float)random.NextDouble() * 10000f;
+        float offsetY = (float)random.NextDouble() * 10000f;
+
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                float sampleX = x + offsetX;
+                float sampleY = y + offsetY;
+                newHeightmap[x, y] = GetFractalNoise(sampleX, sampleY, octaves, persistence, roughness, scale);
+            }
+        }
+
+        return newHeightmap;
+
+        float GetFractalNoise(float x, float y, int octaves, float persistence, float roughness, float scale)
+        {
+            float total = 0;
+            float frequency = scale;
+            float amplitude = 1;
+            float maxVal = 0;
+
+            for (int i = 0; i < octaves; i++)
+            {
+                total += Mathf.PerlinNoise(x * frequency, y * frequency) * amplitude;
+
+                maxVal += amplitude;
+                amplitude *= persistence;
+                frequency *= roughness;
+            }
+
+            return total / maxVal;
+        }
     }
 }

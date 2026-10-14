@@ -35,6 +35,13 @@ public static class Utils
         return coords;
     }
 
+    public static int[,] QuantizeFloatArray(float[,] array)
+    {
+        int[,] newArray = new int[array.GetLength(0), array.GetLength(1)];
+
+        return newArray;
+    }
+
     public static Vector2Int[] ortNeighborsCoords = { new(0, 1), new(1, 0), new(0, -1), new(-1, 0) };
 
     public static float DegToRad(float deg)
