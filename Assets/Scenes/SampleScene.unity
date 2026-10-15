@@ -156,8 +156,9 @@ MonoBehaviour:
   mountainess: 1
   octaves: 5
   persistence: 0.5
-  roughness: 2
+  roughness: 3
   scale: 0.05
+  quantizingPrecision: 10
 --- !u!114 &1266911872
 MonoBehaviour:
   m_ObjectHideFlags: 0

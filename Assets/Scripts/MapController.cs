@@ -5,8 +5,8 @@ public class MapController : MonoBehaviour
 {
     //map settings
     public int seed = 152;
-    public int width = 100;
-    public int height = 100;
+    public int width = 1000;
+    public int height = 1000;
 
     //wavefront algorithm settings
     [Range(0, 1)] public float mountainess = 1f;
