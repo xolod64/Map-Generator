@@ -24,6 +24,7 @@ public static class MapGenerator
 
             startPoints.Enqueue(coord, priority[x, y]);
             visited[x, y] = true;
+            visitedCount++;
         }
 
         while (startPoints.Count > 0)
@@ -32,7 +33,7 @@ public static class MapGenerator
             neighborBuffer.Clear();
 
             float visitedRatio = (float)visitedCount / totalCount;
-            float currentStep = step * mountainess;
+            float currentStep = step * mountainess * visitedRatio * visitedRatio;
 
             // Vector2Int currentPoint = startPoints[i];
             Vector2Int currentPoint = startPoints.Dequeue();

@@ -14,11 +14,11 @@ public class MapController : MonoBehaviour
     //perlin noise settings
     public int octaves = 5;
     [Range(0, 1)] public float persistence = 0.5f;
-    public float roughness = 3f;
-    [Range(0, 0.2f)] public float scale = 0.05f;
+    public float roughness = 6f;
+    [Range(0, 0.2f)] public float scale = 0.015f;
 
     //quantizing settings
-    public int quantizingPrecision = 10;
+    public int quantizingPrecision = 2;
 
     private MapVizualiser mapVizualiser;
     private Map map;
